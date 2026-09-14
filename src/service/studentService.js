@@ -3,7 +3,7 @@ export const addStudent = async student => {
     // and false otherwise
 }
 export const findStudent = async id => {
-// TODO: implement findStudet
+// TODO: implement findStudent
 }
 export const deleteStudent = async id => {
     //TODO Implement deleteStudent
