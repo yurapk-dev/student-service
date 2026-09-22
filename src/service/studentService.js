@@ -1,27 +1,41 @@
+import * as repo from '../repository/studentRepository.js'
+
+const withoutPassword = student => {
+    const {password, ...studentWithoutPassword} = student;
+    return studentWithoutPassword;
+};
+
 export const addStudent = async student => {
-    //TODO: Implement addStudent, return true if student is added successfully
-    // and false otherwise
+    return repo.createStudent(student)
 }
+
 export const findStudent = async id => {
-// TODO: implement findStudent
+    const student = repo.findStudentsById(+id);
+    return student ? withoutPassword(student) : undefined;
 }
+
 export const deleteStudent = async id => {
-    //TODO Implement deleteStudent
+    const student = repo.deleteStudent(+id);
+    return student ? withoutPassword(student) : undefined;
 }
-export const updateStudent = async (id, data) =>
-{
-    //TODO Implement updateStudent
+
+export const updateStudent = async (id, data) => {
+    return repo.updateStudent(+id, data);
 }
-export const addScore = async (id, exam, score) => {
-    //TODO Implement addScore
+
+export const addScore = async (id, examName, score) => {
+    return repo.addScore(+id, examName, score);
 }
+
 export const findStudentsByName = async name => {
-    // TODO findStudentsByName
+    return repo.findStudentsByName(name).map(withoutPassword);
 }
+
 export const countStudentsByNames = async names => {
-    // TODO countStudentsByNames
-}
+    return repo.countStudentsByNames(names);
+};
+
 export const findStudentsByMinScore = async (exam, minScore) => {
-    // TODO findStudentsByMinScore
+    return repo.findStudentsByMinScore(exam, minScore).map(withoutPassword);
 }
 

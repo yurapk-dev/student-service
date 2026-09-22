@@ -1,5 +1,15 @@
 import * as service from '../service/studentService.js'
 
+const sendNotFound = (req, res) => {
+    return res.status(404).send({
+        "timestamp": new Date().toISOString(),
+        "status": 404,
+        "error": "Not Found",
+        "message": `Student with id ${req.params.id} not found`,
+        "path": req.path
+    });
+};
+
 export const addStudent = async (req, res) => {
     const success = await service.addStudent(req.body);
     if (success) {
@@ -13,13 +23,7 @@ export const findStudent = async (req, res) => {
     if (student) {
         return res.json(student);
     } else {
-        return res.status(404).send({
-            "timestamp": new Date().toISOString(),
-            "status": 404,
-            "error": "Not Found",
-            "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
-        });
+        return sendNotFound(req, res);
     }
 }
 
@@ -28,13 +32,7 @@ export const deleteStudent = async (req, res) => {
     if (student) {
         return res.status(200).json(student);
     } else {
-        return res.status(404).send({
-            "timestamp": new Date().toISOString(),
-            "status": 404,
-            "error": "Not Found",
-            "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
-        })
+        return sendNotFound(req, res);
     }
 }
 
@@ -44,13 +42,7 @@ export const updateStudent = async (req, res) => {
         const {id, name, password} = student;
         return res.status(200).json({id, name, password});
     } else {
-        return res.status(404).send({
-            "timestamp": new Date().toISOString(),
-            "status": 404,
-            "error": "Not Found",
-            "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
-        })
+        return sendNotFound(req, res);
     }
 }
 
@@ -60,13 +52,7 @@ export const addScore = async (req, res) => {
     if (success) {
         return res.status(204).send();
     } else {
-        return res.status(404).send({
-            "timestamp": new Date().toISOString(),
-            "status": 404,
-            "error": "Not Found",
-            "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
-        });
+        return sendNotFound(req, res);
     }
 }
 
@@ -76,10 +62,12 @@ export const findStudentsByName = async (req, res) => {
 }
 
 export const countStudentsByNames = async (req, res) => {
-    const {names} = req.query
-    const countStudents = await service.countStudentsByNames(names);
+    const {names} = req.query;
+    if (!names) return res.status(200).json(0);
+    const namesArray = Array.isArray(names) ? names : [names];
+    const countStudents = await service.countStudentsByNames(namesArray);
     return res.status(200).json(countStudents);
-}
+};
 
 export const findStudentsByMinScore = async (req, res) => {
     const {exam, minScore} = req.params

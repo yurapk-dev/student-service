@@ -1,5 +1,5 @@
 import express from 'express';
-import studentRoutes from './routes/student';
+import studentRoutes from './routes/studentRoutes.js';
 
 const port = process.env.PORT || 3000;
 
@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(studentRoutes)
 
-app.app.use((req, res) => {
+app.use((req, res) => {
     res.status(404).type('text/plain; charset=utf-8')
         .send('Not found');
 })
