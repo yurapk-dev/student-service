@@ -1,41 +1,27 @@
 import * as repo from '../repository/studentRepository.js'
 
-const withoutPassword = student => {
-    const {password, ...studentWithoutPassword} = student;
-    return studentWithoutPassword;
+const renameId = student => {
+    if (!student) return student;
+    const {_id, ...data} = student;
+    return {id: _id, ...data};
 };
 
 export const addStudent = async student => {
     return repo.createStudent(student)
 }
 
-export const findStudent = async id => {
-    const student = repo.findStudentsById(+id);
-    return student ? withoutPassword(student) : undefined;
-}
+export const findStudent = async id => renameId(await repo.findStudentsById(+id));
 
-export const deleteStudent = async id => {
-    const student = repo.deleteStudent(+id);
-    return student ? withoutPassword(student) : undefined;
-}
 
-export const updateStudent = async (id, data) => {
-    return repo.updateStudent(+id, data);
-}
+export const deleteStudent = async id => renameId(await repo.deleteStudent(+id));
 
-export const addScore = async (id, examName, score) => {
-    return repo.addScore(+id, examName, score);
-}
+export const updateStudent = async (id, data) => renameId(await repo.updateStudent(+id, data));
 
-export const findStudentsByName = async name => {
-    return repo.findStudentsByName(name).map(withoutPassword);
-}
+export const addScore = async (id, examName, score) => await repo.updateStudent(+id, {[`scores.${examName}`]: score});
 
-export const countStudentsByNames = async names => {
-    return repo.countStudentsByNames(names);
-};
+export const findStudentsByName = async name => (await repo.findStudentsByName(name)).map(renameId);
 
-export const findStudentsByMinScore = async (exam, minScore) => {
-    return repo.findStudentsByMinScore(exam, minScore).map(withoutPassword);
-}
+export const countStudentsByNames = async names => await repo.countStudentsByNames(names);
+
+export const findStudentsByMinScore = async (exam, minScore) => (await repo.findStudentsByMinScore(exam, +minScore)).map(renameId);
 
