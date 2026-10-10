@@ -39,8 +39,7 @@ export const deleteStudent = async (req, res) => {
 export const updateStudent = async (req, res) => {
     const student = await service.updateStudent(req.params.id, req.body);
     if (student) {
-        const {id, name, password} = student;
-        return res.status(200).json({id, name, password});
+        return res.json(student)
     } else {
         return sendNotFound(req, res);
     }

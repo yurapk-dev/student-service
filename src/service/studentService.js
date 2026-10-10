@@ -1,41 +1,26 @@
-import * as repo from '../repository/studentRepository.js'
+import * as repo from "../repository/studentRepository.js";
 
-const withoutPassword = student => {
-    const {password, ...studentWithoutPassword} = student;
-    return studentWithoutPassword;
-};
-
-export const addStudent = async student => {
-    return repo.createStudent(student)
+export const addStudent = async ({id, name, password}) => {
+    if (await repo.findStudentById(id)) {
+        return false;
+    }
+    await repo.createStudent({_id: id, name, password});
+    return true;
 }
 
-export const findStudent = async id => {
-    const student = repo.findStudentsById(+id);
-    return student ? withoutPassword(student) : undefined;
+export const findStudent = async id => await repo.findStudentById(+id);
+
+export const deleteStudent = async (id) => await repo.deleteStudent(+id);
+
+export const updateStudent = async (id, data) => (await repo.updateStudent(+id, data)).toObject();
+
+export const addScore = async (id, exam, score) => await repo.updateStudent(+id, {[`scores.${exam}`]: score});
+
+export const findStudentsByName = async (name) => await repo.findStudentsByName(name);
+
+export const countStudentsByNames = async (names) => {
+    names = Array.isArray(names) ? names : [names];
+    return await repo.countStudentsByNames(names);
 }
 
-export const deleteStudent = async id => {
-    const student = repo.deleteStudent(+id);
-    return student ? withoutPassword(student) : undefined;
-}
-
-export const updateStudent = async (id, data) => {
-    return repo.updateStudent(+id, data);
-}
-
-export const addScore = async (id, examName, score) => {
-    return repo.addScore(+id, examName, score);
-}
-
-export const findStudentsByName = async name => {
-    return repo.findStudentsByName(name).map(withoutPassword);
-}
-
-export const countStudentsByNames = async names => {
-    return repo.countStudentsByNames(names);
-};
-
-export const findStudentsByMinScore = async (exam, minScore) => {
-    return repo.findStudentsByMinScore(exam, minScore).map(withoutPassword);
-}
-
+export const findStudentsByMinScore = async (exam, minScore) => await repo.findStudentsByMinScore(exam, +minScore);

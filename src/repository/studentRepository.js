@@ -1,74 +1,19 @@
-import Student from "../model/student.js";
+import Student from '../model/student.js';
 
-const students = new Map();
+export const createStudent = student => Student.create(student);
 
-export const createStudent = ({id, name, password}) => {
-    if (students.has(id)) {
-        return false;
-    }
-    students.set(id, new Student(id, name, password));
-    return true;
-}
+export const findStudentById = id => Student.findById(id).select({password: 0}).exec();
 
-export const findStudentsById = id => students.get(id);
+export const deleteStudent = id => Student.findByIdAndDelete(id).select({password: 0}).exec();
 
-export const deleteStudent = id => {
-    const student = students.get(id);
-    if (!student) {
-        return undefined;
-    }
-    students.delete(id);
-    return student;
-};
+export const updateStudent = (id, data) => Student.findByIdAndUpdate(id, data, {returnDocument: 'after'}).select({scores: 0}).exec();
 
-export const updateStudent = (id, {name, password}) => {
-    const student = students.get(id);
-    if (!student) {
-        return undefined;
-    }
-    if (name !== undefined) {
-        student.name = name;
-    }
-    if (password !== undefined) {
-        student.password = password;
-    }
-    return student;
-};
 
-export const addScore = (id, examName, score) => {
-    const student = students.get(id);
-    if (!student) {
-        return false;
-    }
-    student.scores[examName] = score;
-    return true;
-};
-
-export const findStudentsByName = name => {
-    const result = [];
-    for (const student of students.values()) {
-        if (student.name.toLowerCase() === name.toLowerCase()) {
-            result.push(student);
-        }
-    }
-    return result;
-};
+export const findStudentsByName = name => Student.find({name: new RegExp(`^${name}$`, 'i')}).select({password: 0}).exec();
 
 export const countStudentsByNames = names => {
-    let count = 0;
-    for (const student of students.values()) {
-        if (names.some(name => name.toLowerCase() === student.name.toLowerCase())) {
-            count++;
-        }
-    }
-    return count;
-};
+    const regexConditions = names.map(name => ({name: {$regex: `^${name}$`, $options: 'i'}}));
+    return Student.countDocuments({$or: regexConditions});
+}
 
-export const findStudentsByMinScore = (exam, minScore) => {
-    return Array.from(students.values()).filter(
-        student => +student.scores[exam] >= +minScore
-    );
-};
-
-
-
+export const findStudentsByMinScore = (exam, minScore) => Student.find({[`scores.${exam}`]: {$gte: minScore}}).select({password: 0}).lean().exec();
